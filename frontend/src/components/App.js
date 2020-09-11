@@ -74,7 +74,7 @@ class App extends Component {
   }
 }
 
-class Home extends Component {
+class CharacterList extends Component {
     constructor(props) {
     super(props);
     this.state = {
@@ -120,6 +120,100 @@ class Home extends Component {
     }
 }
 
+class CreateAccount extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+        userName: '',
+        password: '',
+        confirmPassword: '',
+        passwordErrorMessage: ''
+    };
+
+    this.handleUserNameChange = this.handleUserNameChange.bind(this);
+    this.handlePasswordChange = this.handlePasswordChange.bind(this);
+    this.handleConfirmPasswordChange = this.handleConfirmPasswordChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+    handleUserNameChange(event) {
+        this.setState({userName: event.target.value});
+    }
+
+    handlePasswordChange(event) {
+        this.setState({password: event.target.value});
+    }
+
+    handleConfirmPasswordChange(event) {
+        this.setState({confirmPassword: event.target.value});
+    }
+
+  handleSubmit(event) {
+    if(this.state.password !== this.state.confirmPassword) {
+        this.setState({
+            passwordErrorMessage: "Provided passwords do not match",
+            password: "",
+            confirmPassword: "",
+            errorMessage: ""
+        });
+        event.preventDefault();
+        return;
+    }
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            username: this.state.userName,
+            password: this.state.password
+        })
+    };
+    fetch('api/users/', requestOptions)
+        .then(response => {
+            console.log(requestOptions.body);
+           // check for error response
+            if (!response.ok) {
+                // get error message from body or default to response status
+                const data =  response.json();
+                const error = (data && data.message) || response.status;
+                return Promise.reject(error);
+            }
+            return response.json();
+        })
+        .then(data => this.setState({
+            userName: '',
+            password: '',
+            confirmPassword: ''
+        }))
+        .catch(error => {
+            this.setState({ passwordErrorMessage: error.toString() });
+            console.error('There was an error!', error);
+        });
+    event.preventDefault();
+  }
+
+  render() {
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <label>
+          Username:
+          <input type="text" value={this.state.userName} onChange={this.handleUserNameChange} />
+        </label>
+        <p>{this.state.passwordErrorMessage}</p>
+        <label>
+          Password:
+          <input type="text" value={this.state.password} onChange={this.handlePasswordChange} />
+        </label>
+        <label>
+          Confirm Password:
+          <input type="text" value={this.state.confirmPassword} onChange={this.handleConfirmPasswordChange} />
+        </label>
+        <input type="submit" value="Submit" />
+      </form>
+    );
+  }
+}
+
 function About() {
   return <h2>About</h2>;
 }
@@ -127,6 +221,17 @@ function About() {
 function Users() {
   return <h2>Users</h2>;
 }
+
+
+function Home() {
+    return (
+        <div>
+            <h2>Home</h2>
+            <CreateAccount />
+        </div>
+    );
+}
+
 
 export default App;
 
