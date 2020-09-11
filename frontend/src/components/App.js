@@ -4,7 +4,8 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
+  Link,
+  Redirect,
 } from "react-router-dom";
 
 class App extends Component {
@@ -127,7 +128,8 @@ class CreateAccount extends Component {
         userName: '',
         password: '',
         confirmPassword: '',
-        passwordErrorMessage: ''
+        passwordErrorMessage: '',
+        redirect: false,
     };
 
     this.handleUserNameChange = this.handleUserNameChange.bind(this);
@@ -183,16 +185,20 @@ class CreateAccount extends Component {
         .then(data => this.setState({
             userName: '',
             password: '',
-            confirmPassword: ''
+            confirmPassword: '',
+            redirect: true
         }))
         .catch(error => {
             this.setState({ passwordErrorMessage: error.toString() });
             console.error('There was an error!', error);
         });
-    event.preventDefault();
+        event.preventDefault();
   }
 
   render() {
+    if (this.state.redirect) {
+      return <Redirect to='/about'/>
+    }
     return (
       <form onSubmit={this.handleSubmit}>
         <label>
@@ -207,6 +213,93 @@ class CreateAccount extends Component {
         <label>
           Confirm Password:
           <input type="text" value={this.state.confirmPassword} onChange={this.handleConfirmPasswordChange} />
+        </label>
+        <input type="submit" value="Submit" />
+      </form>
+    );
+  }
+}
+
+class Login extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+        userName: '',
+        password: '',
+        passwordErrorMessage: '',
+        redirect: false,
+    };
+
+    this.handleUserNameChange = this.handleUserNameChange.bind(this);
+    this.handlePasswordChange = this.handlePasswordChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+    handleUserNameChange(event) {
+        this.setState({userName: event.target.value});
+    }
+
+    handlePasswordChange(event) {
+        this.setState({password: event.target.value});
+    }
+
+  handleSubmit(event) {
+    if(this.state.password !== this.state.confirmPassword) {
+        this.setState({
+            passwordErrorMessage: "Provided passwords do not match",
+            password: "",
+            errorMessage: ""
+        });
+        event.preventDefault();
+        return;
+    }
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            username: this.state.userName,
+            password: this.state.password
+        })
+    };
+    fetch('api/users/', requestOptions)
+        .then(response => {
+            console.log(requestOptions.body);
+           // check for error response
+            if (!response.ok) {
+                // get error message from body or default to response status
+                const data =  response.json();
+                const error = (data && data.message) || response.status;
+                return Promise.reject(error);
+            }
+            return response.json();
+        })
+        .then(data => this.setState({
+            userName: '',
+            password: '',
+            redirect: true
+        }))
+        .catch(error => {
+            this.setState({ passwordErrorMessage: error.toString() });
+            console.error('There was an error!', error);
+        });
+        event.preventDefault();
+  }
+
+  render() {
+    if (this.state.redirect) {
+      return <Redirect to='/about'/>
+    }
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <label>
+          Username:
+          <input type="text" value={this.state.userName} onChange={this.handleUserNameChange} />
+        </label>
+        <p>{this.state.passwordErrorMessage}</p>
+        <label>
+          Password:
+          <input type="text" value={this.state.password} onChange={this.handlePasswordChange} />
         </label>
         <input type="submit" value="Submit" />
       </form>

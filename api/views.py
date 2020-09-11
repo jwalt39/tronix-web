@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User, Group
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions, status
 
 from .models import CharacterModel
 from .serializers import UserSerializer, GroupSerializer, CharacterSerializer
@@ -29,3 +29,4 @@ class GroupViewSet(viewsets.ModelViewSet):
 class CharacterViewSet(viewsets.ModelViewSet):
     queryset = CharacterModel.objects.all()
     serializer_class = CharacterSerializer
+
