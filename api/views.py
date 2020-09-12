@@ -2,6 +2,7 @@ from django.contrib.auth.models import User, Group
 from rest_framework import viewsets, permissions, status
 
 from .models import CharacterModel
+from .permissions import AnonCreateAndUpdateOwnerOnly
 from .serializers import UserSerializer, GroupSerializer, CharacterSerializer
 from django.shortcuts import render
 
@@ -11,6 +12,7 @@ def index(request):
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    permission_classes = (AnonCreateAndUpdateOwnerOnly, )
     """
     API endpoint that allows users to be viewed or edited.
     """

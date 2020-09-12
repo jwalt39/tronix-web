@@ -12,7 +12,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "js-cookie": "^2.2.1",
     "react-router-dom": "^5.2.0",
+    "regenerator": "^0.14.7",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12"
   },
