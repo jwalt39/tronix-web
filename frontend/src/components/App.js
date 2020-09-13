@@ -10,6 +10,7 @@ import {
 } from "react-router-dom";
 import { Login } from "./Authentication";
 import AuthenticatedRoute from "./AuthenticatedRoute";
+import { getAccessToken } from "./AuthenticatedRoute";
 
 class App extends Component {
   constructor(props) {
@@ -62,18 +63,13 @@ class App extends Component {
           {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
           <Switch>
-            <AuthenticatedRoute path="/about">
-              <About />
-            </AuthenticatedRoute>
             <AuthenticatedRoute path="/users">
               <Users />
             </AuthenticatedRoute>
             <Route path="/login">
               <Login />
             </Route>
-            <Route path="/">
-              <Home />
-            </Route>
+            <AuthenticatedRoute component={CharacterList} path="/" />
           </Switch>
         </div>
       </Router>
@@ -92,7 +88,14 @@ class CharacterList extends Component {
   }
 
   componentDidMount() {
-    fetch("api/characters")
+    const requestOptions = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "JWT " + getAccessToken(),
+      },
+    };
+    fetch("api/characters", requestOptions)
       .then((response) => {
         if (response.status > 400) {
           return this.setState(() => {
@@ -248,15 +251,6 @@ function About() {
 
 function Users() {
   return <h2>Users</h2>;
-}
-
-function Home() {
-  return (
-    <div>
-      <h2>Home</h2>
-      <CreateAccount />
-    </div>
-  );
 }
 
 export default withRouter(App);

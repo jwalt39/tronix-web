@@ -12,7 +12,6 @@ def index(request):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    permission_classes = (AnonCreateAndUpdateOwnerOnly, )
     """
     API endpoint that allows users to be viewed or edited.
     """

@@ -8,7 +8,9 @@ import {
   Redirect,
   useHistory,
 } from "react-router-dom";
+import { setTokens } from "./AuthenticatedRoute";
 
+import AuthenticatedRoute from "./AuthenticatedRoute";
 export class Login extends Component {
   constructor(props) {
     super(props);

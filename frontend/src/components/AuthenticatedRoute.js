@@ -35,13 +35,13 @@ function refreshTokens() {
     });
 }
 
-function setTokens(access_token, refresh_token) {
-  const expires = (tokens.expires_in || 60 * 60) * 1000;
+export function setTokens(access_token, refresh_token, expires_in = 60 * 60) {
+  const expires = (expires_in || 60 * 60) * 1000;
   const inOneHour = new Date(new Date().getTime() + expires);
 
   // you will have the exact same setters in your Login page/app too
-  Cookies.set("access_token", tokens.access_token, { expires: inOneHour });
-  Cookies.set("refresh_token", tokens.refresh_token);
+  Cookies.set("access_token", access_token, { expires: inOneHour });
+  Cookies.set("refresh_token", refresh_token);
 }
 
 const authenticate = async (history) => {
@@ -49,7 +49,7 @@ const authenticate = async (history) => {
     try {
       const tokens = await refreshTokens(); // call an API, returns tokens
 
-      setTokens(tokes.access_token, getRefreshToken());
+      setTokens(tokens.access, tokens.refresh);
       return true;
     } catch (error) {
       history.push("/login");
